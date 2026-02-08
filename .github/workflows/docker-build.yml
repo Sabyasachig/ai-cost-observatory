@@ -1,0 +1,61 @@
+name: Docker Build & Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Docker images
+      run: docker-compose build
+      
+    - name: Start services
+      run: docker-compose up -d
+      
+    - name: Wait for services to be ready
+      run: |
+        echo "Waiting for API to be ready..."
+        timeout 60 bash -c 'until curl -f http://localhost:8000/health; do sleep 2; done'
+        
+    - name: Test API health
+      run: |
+        response=$(curl -s http://localhost:8000/health)
+        echo "API Response: $response"
+        if [[ $response != *"healthy"* ]]; then
+          echo "API health check failed"
+          exit 1
+        fi
+        
+    - name: Test dashboard accessibility
+      run: |
+        status_code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8501)
+        echo "Dashboard status code: $status_code"
+        if [[ $status_code != "200" ]]; then
+          echo "Dashboard is not accessible"
+          exit 1
+        fi
+        
+    - name: View logs on failure
+      if: failure()
+      run: |
+        echo "=== API Logs ==="
+        docker-compose logs api
+        echo "=== Dashboard Logs ==="
+        docker-compose logs dashboard
+        echo "=== Database Logs ==="
+        docker-compose logs postgres
+        
+    - name: Stop services
+      if: always()
+      run: docker-compose down
