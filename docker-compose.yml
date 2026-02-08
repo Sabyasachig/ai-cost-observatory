@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ai_cost_observatory_db
+    environment:
+      POSTGRES_USER: ai_observatory
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: ai_cost_observatory
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - ai_cost_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ai_observatory"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Server
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: ai_cost_observatory_api
+    environment:
+      DATABASE_URL: postgresql://ai_observatory:changeme@postgres:5432/ai_cost_observatory
+      CORS_ORIGINS: "*"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ai_cost_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # Streamlit Dashboard
+  dashboard:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    container_name: ai_cost_observatory_ui
+    environment:
+      # Use the service name 'api' which is resolvable within Docker network
+      API_URL: http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - ai_cost_network
+    restart: unless-stopped
+
+networks:
+  ai_cost_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
