@@ -9,6 +9,30 @@
 
 ---
 
+## 🚀 NEW: Automated Release Pipeline Available!
+
+**The easiest way to publish is now through automated GitHub releases!**
+
+Instead of manually publishing to PyPI, you can now create a GitHub release and the pipeline will automatically:
+- ✅ Build the package
+- ✅ Publish to TestPyPI
+- ✅ Publish to PyPI
+- ✅ Upload release assets
+- ✅ Notify on success
+
+**Quick Start**:
+```bash
+./create-release.sh
+```
+
+**Full Guide**: See [docs/RELEASE_PIPELINE.md](docs/RELEASE_PIPELINE.md)
+
+**Choose your method**:
+- **Method 1 (Recommended)**: Automated releases → See [RELEASE_PIPELINE.md](docs/RELEASE_PIPELINE.md)
+- **Method 2 (Manual)**: Follow the steps below for manual PyPI publishing
+
+---
+
 ## ✅ What's Been Completed
 
 ### 1. Dependency Issues Resolved ✅
