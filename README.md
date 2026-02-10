@@ -39,7 +39,7 @@ Track LLM costs, optimize spending, and gain insights into your AI systems. Mode
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ai-cost-observatory.git
+git clone https://github.com/Sabyasachig/ai-cost-observatory.git
 cd ai-cost-observatory
 
 # Start with Docker Compose (recommended)
@@ -349,8 +349,8 @@ If this project helps you, please star it on GitHub!
 
 ## 📧 Contact
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
+- GitHub: [@Sabyasachig](https://github.com/Sabyasachig)
+- Email: ghoshsabyasachi0@gmail.com
 
 ## 🙏 Acknowledgments
 
